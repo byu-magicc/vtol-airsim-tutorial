@@ -1,0 +1,601 @@
+% Last Modified:
+% 9/2/2021 warnick@byu.edu (kfw): commented bookmark commands for title, abstract, and toc, as the bookmarks were duplicated
+
+
+% Says that we need LaTeX2e
+\NeedsTeXFormat{LaTeX2e}
+% Says what this package does
+\ProvidesPackage{byustyle}
+  [2006/05/17 BYU Style v1.0
+  Provides support for all of the required BYU Thesis/Dissertation formatting]
+
+% Requires the xkeyval package
+\RequirePackage{xkeyval}
+
+% So we can have the abstract and acknowledgements sections only be on odd pages
+\RequirePackage{afterpage}
+
+%To calculate the right page number to use for the TOC
+%MDR does not believe these are needed because the right page number for the TOC occurs automatically
+\RequirePackage{calc}
+\RequirePackage{ifthen}
+
+% Needed to get the spacing in the TOC correct for the longer Chapter and Appendix names
+% \RequirePackage{mathptmx}
+% MDR commented this out because it changes the fonts used for caligraphic math and
+% some of the greek symbols.
+% Instead, I increased \@tempdima in the definition of \l@chapter to make the box
+% holding the the label to be big enough to hold both "Chapter no." and "Appendix let."
+
+
+% this helps control the the spacing between the chapter/appendix label and title in the TOC
+\RequirePackage[titles]{tocloft}
+
+% For controlling the formatting of the document
+\define@boolkeys[BYUs]{formatting}{isdissertation}[false]{}
+
+% Set it so that the formatting controls will be set to their defaults if the user doesn't specify them
+\setkeys[BYUs]{formatting}{isdissertation}{}
+
+% Commands for getting if the name of the paper and degree
+\newcommand{\@papername}{\ifBYUs@formatting@isdissertation dissertation \else thesis \fi}
+\newcommand{\@degreename}{\ifBYUs@formatting@isdissertation Doctor of Philosophy \else Master of Science \fi}
+
+% For controlling which sections are shown
+\define@boolkeys[BYUs]{sections}{noabstract,nouniversitypages,noacknowledgements,notableofcontents,nolistoffigures,nolistoftables,notocandlists,nonomenclature}[false]
+
+% Set it so that the formatting controls will be set to their defaults if the user doesn't specify them
+\setkeys[BYUs]{sections}{noabstract,nouniversitypages,noacknowledgements,notableofcontents,nolistoffigures,nolistoftables,notocandlists,nonomenclature}{}
+
+% This one is just a convenience one for turning everything off
+\define@boolkey[BYUs]{sections}{noheaderatall}[false]{%
+  \ifBYUs@sections@noheaderatall
+    \setkeys[BYUs]{sections}{noabstract=true,nouniversitypages=true,noacknowledgements=true,notableofcontents=true,nolistoffigures=true,nolistoftables=true,notocandlists=true,nonomenclature=true}
+  \fi
+}
+
+% Change what the bibliography is called.
+\renewcommand\bibname{REFERENCES}
+
+% For setting the Department and Committee information that needs to be filled in
+\define@cmdkeys[BYUs]{names}{deptname,committeechairman,committeemembera,committeememberb,committeememberc,committeememberd, keywords}[MISSING]
+
+% Set it so that the names will be set to their default values (MISSING) so everything will compile ok and that we can print warnings if the user doesn't specify everything that they should
+\presetkeys[BYUs]{names}{deptname,committeechairman,committeemembera,committeememberb,committeememberc,committeememberd, keywords}{}
+
+
+% For setting the "other" information that has valid defaults
+\define@cmdkey[BYUs]{dates}{graddate}[]{}
+\define@cmdkey[BYUs]{dates}{copyrightyear}[\number\the\year]{}
+
+% Set it so that the dates will be set to their defaults if the user doesn't specify them
+\setkeys[BYUs]{dates}{graddate,copyrightyear}{}
+
+%Process all of the options so they will kick in
+\ProcessOptions\relax
+
+% For the user to set everything up
+\newcommand{\byustylesetup}[1]{\setkeys[BYUs]{formatting,sections,names,dates}{#1}}
+
+
+% Formatting stuff that sets up all of the margins
+\if@twoside
+  \setlength{\oddsidemargin}{0.0in}
+  \setlength{\evensidemargin}{0in}
+  \setlength{\textwidth}{6.5in}
+\else
+  \setlength{\oddsidemargin}{0in}
+  \setlength{\evensidemargin}{0in}
+  \setlength{\textwidth}{6.5in}
+\fi
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\topmargin}{0in}
+\setlength{\textheight}{9in}
+
+%\setlength{\textfloatsep}{36pt}
+\setlength{\textfloatsep}{.375in plus .05in minus .05in}
+\setlength{\intextsep}{.375in plus .05in minus .05in}
+
+% Make it so that it doesn't stick figures on their own page so easily
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\textfraction}{0.1}
+
+% Make it so that float pages will include text more easily
+\renewcommand{\floatpagefraction}{0.75}
+\setlength{\floatsep}{.375in plus .05in minus .05in}
+
+%For formatting table captions in the desired way
+\newif\if@istable
+\renewenvironment{table}
+               {\@istabletrue \@float{table}}
+               {\end@float \@istablefalse}
+\renewenvironment{table*}
+               {\@istabletrue \@dblfloat{table}}
+               {\end@dblfloat \@istablefalse}
+\long\def\@makecaption#1#2{%
+  \vskip\abovecaptionskip
+  \if@istable
+  	 \centering #1: #2 \vskip12pt\par %
+  \else
+      \sbox\@tempboxa{#1: #2}%
+      \ifdim \wd\@tempboxa >\hsize
+  	  #1: #2\par
+  	\else
+  	  \global \@minipagefalse
+   	 \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
+ 	 \fi
+  \fi
+  \vskip\belowcaptionskip}
+
+% Formatting stuff for the paragraphs
+\marginparwidth 40pt
+\marginparsep 10pt
+
+% Making it so that it doesn't like to hyphenate words
+\brokenpenalty=1000
+
+% Control stuff to make it so that there aren't widows and orphans
+\clubpenalty=10000
+\widowpenalty=10000
+\raggedbottom
+
+% A macro for setting the font size
+\newcommand{\byubaselinestretch}[1]{
+  \renewcommand{\baselinestretch}{#1}
+  \normalsize
+}
+
+
+% Title Page
+\newcommand{\@titlepage}{
+  % Add a pdf bookmark so that it will show up in the PDF
+  % kfw - 9/2/21 - this bookmark is duplicated
+  %\pdfbookmark[0]{Title Page}{titlepage}
+  % Put the title centered on the page
+  \begin{center}
+    \expandafter{\@title}
+  \end{center}
+  % add spacing between title and author
+  \vfill
+  % Put the author on the page
+  \begin{center}
+    \@author
+  \end{center}
+  % add spacing betweein title and BYU stuff
+  \vfill
+  \singlespacing
+  % Put in the stuff about it being submitted to BYU
+  \begin{center}
+    A \@papername submitted to the faculty of\\
+    Brigham Young University\\
+    in partial fulfillment of the requirements for the degree of\\
+    \vspace*{\baselineskip}
+    \@degreename
+  \end{center}
+  % add spacing between BYU stuff and committee members
+  \vfill
+  \begin{center}
+  \cmdBYUs@names@committeechairman, Chair\\
+  \cmdBYUs@names@committeemembera\\
+  \cmdBYUs@names@committeememberb\\
+  \ifBYUs@formatting@isdissertation
+  	\cmdBYUs@names@committeememberc
+	%
+	% BYU doctoral committees comprise four members:
+	%    the chair
+	%    committee member a
+	%    committee member b
+	%    committee member c
+	% if your committee has more than four (say the traditional five) then
+	% this if statement should read
+	% \cmdBYUs@names@committeememberc\\
+	% \cmdBYUs@names@committeememberd
+	%
+	% You will also need to add an additional committee member after line 25 in master.tex
+	%
+	% For even more additional members, add the double backslash and continue with
+	% the naming pattern. Make the corresponding changes in master.tex
+	%
+\fi
+  \end{center}
+  % add spacing between committee names and department/university name
+  \vfill
+  \doublespacing
+  \begin{center}
+    \cmdBYUs@names@deptname\\
+    Brigham Young University\\
+    \cmdBYUs@dates@graddate
+  \end{center}
+  % add spacing between department/university and copyright information
+  \vfill
+  %Put in the copyright information
+  \begin{center}
+   Copyright \copyright\ \cmdBYUs@dates@copyrightyear\ \@author \\
+   All Rights Reserved
+     \end{center}
+  \cleardoublepage
+}
+
+
+% Abstract page
+\newcommand{\@abstractpage}[1]{
+  % Add a pdf bookmark so that it will show up in the PDF
+  % kfw: abstract bookmark is duplicated, commented this out. The other bookmark needed a \phantomsection added to the toc
+  % entry to get it to point to the correct page
+  %\pdfbookmark[0]{Abstract}{Abstract}
+
+  % Put the abstract header centered on the page
+  \begin{center}
+  % We want the actual abstract (including title) to be single spaced
+  \singlespacing
+
+    ABSTRACT\\
+    \vspace{0.15in}
+    \afterpage{\cleardoublepage}
+           {\expandafter{\@title}}\\
+    \vspace{0.15in}
+    \@author\\
+    \cmdBYUs@names@deptname, BYU\\
+    \@degreename
+  \end{center}
+
+  % We want the actual abstract (including title) to be single spaced
+  \singlespacing
+    \setlength{\parskip}{1\baselineskip}
+
+  % Start a new line, so that it will indent the abstract
+  \vspace*{-0.4in}
+  \par
+
+  % Include the abstract.tex file
+  \input{abstract}
+  \par\mbox{ }
+  \vfill
+  \noindent Keywords: \cmdBYUs@names@keywords
+      \setlength{\parskip}{0\baselineskip}
+  \cleardoublepage
+}
+
+% Acknowledgments page
+\newcommand{\@acknowledgements}[1]{
+  % Put in a phantom section, so that hyperref doesn't whine about no place for an anchor
+  \phantomsection
+
+  % Put the header centered on the page
+  \begin{center}
+  \afterpage{\cleardoublepage}
+    ACKNOWLEDGMENTS\\[15pt]
+  \end{center}
+  \doublespacing
+
+  % Start a new line, so that it will indent the abstract
+  \par
+  % Include the acknowledgements.tex file
+  \input{acknowledgements}
+  \par\mbox{ }
+  \singlespacing
+  \cleardoublepage
+}
+
+% Change the name of the Table of Contents from "Contents" to "Table of Contents"
+\renewcommand{\contentsname}{\uppercase{Table of Contents}}
+
+% Define List of Tables and List of Figures names
+\renewcommand{\listtablename}{List of Tables}
+\renewcommand{\listfigurename}{List of Figures}
+
+% Redefine the size of the chapter label
+\renewcommand{\@makechapterhead}[1]{
+{
+  % Make the chapter title single spaced
+  \singlespacing
+  % Make it so that the Chapter headings aren't indented
+  \parindent 0pt
+  % Stick a space in so that it will be 2 inches from the top and that won't be removed by LaTeX
+  \vspace*{0.725in}
+  \ifnum \c@secnumdepth > \m@ne
+   \bf \uppercase{\MakeUppercase{\@chapapp}\ \thechapter. \hspace{1em} #1}
+    \par
+    \vspace{\baselineskip}
+  \else%
+    \bf \uppercase\expandafter{#1}
+    \par
+   \vspace{\baselineskip}
+  \fi
+  % Stick the actual chapter name in
+  % Skip two spaces
+   \vspace{\baselineskip}
+  % I have no idea what this does
+  \nobreak
+}}
+
+% Redefine the size of the chapter label
+\renewcommand{\@makeschapterhead}[1]{
+{
+  % Make the chapter title single spaced
+  \singlespacing
+  % Make it so that the Chapter headings aren't indented
+  \parindent 0pt
+  % Stick a space in so that it will be 2 inches from the top and that won't be removed by LaTeX
+  %\vspace*{0.725in}
+  % Stick the actual chapter name in
+   \begin{center}\uppercase\expandafter{#1} \end{center}
+  % I have no idea what this does
+  \nobreak
+}}
+
+% Chapter command for use in the thesis/dissertation
+\renewcommand{\chapter}{
+  % Make it so that chapters will always start on odd pages
+  \cleardoublepage
+  % Tell it that it needs to indent after this is done
+  \@afterindenttrue
+  % I have no idea what this does
+  \global\@topnum\z@
+  % And what this does is a mystery too
+  \secdef\@chapter\@schapter
+}
+
+% Section commands for use in the thesis/dissertation
+\renewcommand{\section}{
+  % The parameters of \@startsection are {NAME}{LEVEL}{INDENT}{BEFORESKIP}{AFTERSKIP}{STYLE}
+  \@startsection{section}{1}{\z@}{
+    3ex plus 1ex minus .2ex}{
+    1.3ex plus .2ex}{
+    \singlespacing\normalsize\bf}
+}
+\setcounter{secnumdepth}{1}%set this to 2 or greater if you want your subsubsections numbered (not recommended).
+% Subsection commands for use in the thesis/dissertation
+\renewcommand{\subsection}{
+  % The parameters of \@startsection are {NAME}{LEVEL}{INDENT}{BEFORESKIP}{AFTERSKIP}{STYLE}
+  \@startsection{subsection}{1}{\z@}{
+    3ex plus 1ex minus .2ex}{
+    1.3ex plus .2ex}{
+    \singlespacing\normalsize\bf}
+}
+
+% Subsubsection commands for use in the thesis/dissertation
+\renewcommand{\subsubsection}{
+  % The parameters of \@startsection are {NAME}{LEVEL}{INDENT--\z@ is shorthand for 0pt.}{BEFORESKIP}{AFTERSKIP}{STYLE}
+  \@startsection{subsubsection}{2}{\z@}{
+    3ex plus 1ex minus .2ex}{
+    1.3ex plus .2ex}{
+    \singlespacing\normalsize\bf}
+}
+
+% Format the bibliography correctly
+\renewenvironment{thebibliography}[1]
+     {\phantomsection
+     \addcontentsline{toc}{chapter}{References}
+     \chapter*{\vspace*{0.7in}\protect\bf{\bibname}}%
+      \@mkboth{\MakeUppercase\bibname}{\MakeUppercase\bibname}%
+      \singlespacing%
+      \list{\@biblabel{\@arabic\c@enumiv}}%
+           {\settowidth\labelwidth{\@biblabel{#1}}%
+            \leftmargin\labelwidth
+            \advance\leftmargin\labelsep
+            \@openbib@code
+            \usecounter{enumiv}%
+            \let\p@enumiv\@empty
+            \renewcommand\theenumiv{\@arabic\c@enumiv}%
+            \setlength{\itemsep}{0.25\baselineskip}}%
+      \sloppy
+      \clubpenalty4000
+      \@clubpenalty \clubpenalty
+      \widowpenalty4000%
+      \sfcode`\.\@m}
+    {\def\@noitemerr
+       {\@latex@warning{Empty `thebibliography' environment}}%
+      \endlist%
+      \doublespacing}
+
+% The next five commands allow the table of contents page to be assigned any arbitrary number, to work around
+% BYU's strange requirement that the first pages are single-sided and the subsequent pages are double-sided.
+%
+% MDR: BYU's requirement is not strange. The BYU requirement simply wants the TOC to be on page four in
+% a single-sided mode. Nothing more. Nothing less.
+% It is not clear to MDR that the next four commands solve the misunderstanding...
+
+\setlength{\cftfigindent}{0pt}  % remove indentation from figures in lof
+\setlength{\cfttabindent}{0pt}  % remove indentation from tables in lot
+\newcommand\chapteroneside{\clearpage
+                    \thispagestyle{plain}%
+                    \global\@topnum\z@
+                    \@afterindentfalse
+                    \secdef\@chapter\@schapter}
+
+\renewcommand\tableofcontents{%
+    \if@twocolumn
+      \@restonecoltrue\onecolumn
+    \else
+      \@restonecolfalse
+    \fi
+    \chapteroneside*{\contentsname
+        \@mkboth{%
+           \MakeUppercase\contentsname}{\MakeUppercase\contentsname}}%
+    \@starttoc{toc}%
+    \if@restonecol\twocolumn\fi
+    }
+
+\renewcommand\listoftables{%
+    \if@twocolumn
+      \@restonecoltrue\onecolumn
+    \else
+      \@restonecolfalse
+    \fi
+    \chapteroneside*{\listtablename}%
+      \@mkboth{%
+          \MakeUppercase\listtablename}%
+         {\MakeUppercase\listtablename}%
+    \@starttoc{lot}%
+    \if@restonecol\twocolumn\fi
+    }
+
+\renewcommand\listoffigures{%
+    \if@twocolumn
+      \@restonecoltrue\onecolumn
+    \else
+      \@restonecolfalse
+    \fi
+    \chapteroneside*{\listfigurename}%
+      \@mkboth{\MakeUppercase\listfigurename}%
+              {\MakeUppercase\listfigurename}%
+    \@starttoc{lof}%
+    \if@restonecol\twocolumn\fi
+    }
+
+%The next command redefines the chapter commands so that it prints Chapter 1, Chapter 2, and so on in the toc file.
+\def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne
+                         \refstepcounter{chapter}%
+                         \typeout{\@chapapp\space\thechapter.}%
+                         \addcontentsline{toc}{chapter}%
+                                   {\protect\numberline{\@chapapp~\thechapter\hspace{1em} }#1}%
+                    \else
+                      \addcontentsline{toc}{chapter}{#1}%
+                    \fi
+                    \chaptermark{#1}%
+                    \addtocontents{lof}{\protect\addvspace{10\p@}}%
+                    \addtocontents{lot}{\protect\addvspace{10\p@}}%
+                    \if@twocolumn
+                      \@topnewpage[\@makechapterhead{#2}]%
+                    \else
+                      \@makechapterhead{#2}%
+                      \@afterheading
+                    \fi}
+
+\renewcommand*\l@chapter[2]{%
+  \ifnum \c@tocdepth >\m@ne
+    \addpenalty{-\@highpenalty}%
+    \vskip 1.0em \@plus\p@
+    % \setlength\@tempdima{5.8em}%
+	\setlength\@tempdima{2.75cm}%
+    \begingroup
+      \parindent \z@ \rightskip \@tocrmarg
+      \parfillskip -\@tocrmarg
+      \leavevmode \bfseries
+      \advance\leftskip\@tempdima
+      \hskip -\leftskip
+      #1\nobreak%
+         \leaders\hbox{$\m@th \mkern \@dotsep% \hfil -> core of latex.ltx's
+           mu\hbox{\normalfont.}\mkern \@dotsep mu$}\hfill%
+      \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+      \penalty\@highpenalty
+    \endgroup
+    \vspace{.2em}
+  \fi}
+
+\newcommand{\@nomenclature}[1]{%
+	\chapteroneside*{NOMENCLATURE}
+	\addcontentsline{toc}{chapter}{Nomenclature}
+	\input{nomenclature}
+}
+
+% For the user to create the header
+\newcommand{\showBYUHeader}{%
+  % Turn on the BYU formatting stuff for the header
+  \pagenumbering{roman}
+  % Turn off the page numbering
+  \pagestyle{empty}
+
+  % Turn off paragraph indentation for the stuff up until the abstract
+  \parindent 0pt
+
+  % We want everything to be double spaced in the beginning
+  \byubaselinestretch{2}
+
+  % Write the university pages
+  \ifBYUs@sections@nouniversitypages
+  \else
+    % kfw: added \phantomsection to correct duplicated bookmarks
+    \phantomsection
+  	\addcontentsline{toc}{chapter}{Title Page}
+    \@titlepage
+   \fi
+
+  % Make the indentation for paragraphs be half of an inch
+  \parindent 0.5in
+
+  % Write the abstract in a separate .tex file and include it with the following command:
+  \ifBYUs@sections@noabstract
+  \else
+    % kfw: added this to correct duplicated bookmarks
+    \phantomsection
+  	\addcontentsline{toc}{chapter}{Abstract}
+    \@abstractpage
+  \fi
+
+  % Include acknowledgments (optional) here
+  \ifBYUs@sections@noacknowledgements
+  \else
+    % kfw: added this to correct duplicated bookmarks
+    \phantomsection
+    \addcontentsline{toc}{chapter}{Acknowledgements}
+    \@acknowledgements
+  \fi
+
+  % Turn back on the page numbering
+  \pagestyle{plain}
+
+  % Write the Table of Contents, List of Figures and List of Tables
+  \ifBYUs@sections@notocandlists
+  \else
+    % Set the parskip so that the Table of Contents and Lists will be spaced properly
+    %\setlength{\parskip}{0.5\baselineskip}
+    % Make individual entries single spaced
+    \singlespacing
+    \ifBYUs@sections@notableofcontents
+    \else
+    \if@twoside
+      % \setcounter{page}{\value{page}+1}
+      % \setcounter{page}{\value{page}/2}
+	\fi
+     \ifthenelse{\isodd{\value{page}}}
+    {\def\cleardoubleevenpage{\cleardoublepage}}
+     {\def\cleardoubleevenpage{\clearpage\if@twoside \ifodd\c@page%\else%
+	 	\hbox{}\newpage\if@twocolumn\hbox{}\newpage\fi\fi\fi}}
+
+      % kfw: toc bookmark was duplicated, commented this to remove the extra bookmark
+      % the correct bookmark requires a \phantomsection
+      %\pdfbookmark[0]{Table of Contents}{toc}
+
+	  \setlength{\oddsidemargin}{0.0in}
+	  \setlength{\evensidemargin}{0.0in}
+	  \setlength{\textwidth}{6.5in}
+	  \setlength{\marginparwidth}{0.0in}
+
+      % kfw - added this to correct the bookmark
+      \phantomsection
+
+	  \addcontentsline{toc}{chapter}{Table of Contents}
+	  \tableofcontents
+      \cleardoubleevenpage
+    \fi
+    \ifBYUs@sections@nolistoftables
+    \else
+      \phantomsection
+      \addcontentsline{toc}{chapter}{\listtablename}
+      \listoftables
+      \cleardoubleevenpage
+    \fi
+    \ifBYUs@sections@nolistoffigures
+    \else
+      \phantomsection
+      \addcontentsline{toc}{chapter}{\listfigurename}
+      \listoffigures
+      \cleardoubleevenpage
+    \fi
+    \ifBYUs@sections@nonomenclature
+    \else
+       \@nomenclature
+         \par\mbox{ }
+       \cleardoubleevenpage
+    \fi
+    % Reset the parskip
+    \setlength{\parskip}{0\baselineskip}
+  \fi
+
+  % Turn on the BYU formatting stuff for the main document
+  \byubaselinestretch{1.5}
+  \pagenumbering{arabic}
+}

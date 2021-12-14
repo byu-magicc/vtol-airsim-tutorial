@@ -1,0 +1,81 @@
+%TC:envir minttcb [ignore] xall
+
+\chapter{Miscellaneous Instructions}\label{apdx:misc_instructions}
+
+% \section{Add a New Aircraft Configuration}\label{apdx:add_configuration}
+% This section explains how one could change or add a new \textit{configuration} for the \verb|VTOL| vehicle type. A configuration is the
+
+\section{Authentication for GitHub Using \texttt{gh} Client}\label{apdx:github_config}
+
+An easy way to configure your Linux environment to clone, push, pull, etc.\ from GitHub repositories is to use the official GitHub CLI tool called \ci{gh}. First, go to \url{https://github.com/cli/cli/blob/trunk/docs/install_linux.md} and follow the instructions to install \ci{gh}. Then, in a terminal, run the command \ci{gh auth login}, which will guide you through a number of steps, for which you should do the following:
+
+\begin{itemize}
+    \item Choose \ci{GitHub.com}, then choose \ci{SSH}
+    \begin{itemize}
+        \item If you haven't generated a public SSH key previously, then choose ``yes'' at the prompt by pressing Enter, then press Enter again to leave passphrase blank
+        \item If you already have a public SSH key, then choose it when prompted
+    \end{itemize}
+    \item Choose \ci{Login with a web browser}
+    \item Copy the given code, then press Enter; this will open your web browser
+    \item Authorize in web browser using the copied code
+    \item Go back to the terminal, then press Enter to finish
+\end{itemize}
+
+You can now use either \ci{git} commands or \ci{gh} commands to interact with GitHub repositories. For example, to clone the AirSim repository, you can run either of the following:
+
+\begin{minttcb}[title={Clone a GitHub Repository Option 1: \texttt{git}}]{bash}
+    git clone git@github.com:microsoft/AirSim
+\end{minttcb}
+\begin{minttcb}[title={Clone a GitHub Repository Option 2: \texttt{gh}}]{bash}
+    gh repo clone microsoft/AirSim
+\end{minttcb}
+
+For more information about connecting to GitHub with SSH, see the GitHub docs at \url{https://docs.github.com/en/authentication/connecting-to-github-with-ssh}.
+
+\section{Advanced Setup for Python Virtual Environments}\label{apdx:adv_setup_python_venv}
+
+You can place these bash functions in either your \ci{.bashrc} file or \ci{.zshrc} file, or in another file which is sourced by either of those files. Then, you can run, for example, the command \ci{workon airsim} to activate your Python virtual environment named \ci{airsim}. Run the command \ci{workoff} to deactivate your virtual environment.
+
+\begin{minttcb}[]{bash}
+    workon() {
+        if [[ -n "$VIRTUAL_ENV" ]]; then
+            deactivate
+        fi
+        source $HOME/.virtualenvs/$1/bin/activate
+    }
+
+    workoff() {
+        if [[ -n "$VIRTUAL_ENV" ]]; then
+            deactivate
+        fi
+    }
+\end{minttcb}
+
+
+\section{Alternate Method for Moving Mesh Origins in Blender}\label{apdx:blender_origins_alt}
+In the past, we have accomplished getting the correct pivot points in Unreal Engine using a different method than the procedure outlined in Section~\ref{sec:blender_example}. The method is to:
+
+\begin{itemize}
+    \item create separate \ci{.blend} Blender files for each object mesh that you want to animate on the aircraft (e.g., engines, propellers, ailerons)
+    \item Do the following for each Blender file:
+    \begin{itemize}
+        \item If there are multiple meshes, choose one as the root object and make the other objects the children of it using the drag, then \texttt{Shift+Alt}, then drop technique
+        \item Hold pointer over the Viewport and press \texttt{A} to select all objects
+        \item Select \textbf{Object > Set Origin > Origin to Geometry} to set origins of the meshes to their geometric centers
+        \item Select \textbf{Object > Snap > Cursor to World Origin}
+        \item Select the object, or, if there are multiple objects, select the root object
+        \item Select \textbf{Object > Snap > Selection to Cursor}
+        \item If there are any nonzero values for the Location of the object (or root object), apply the Location by holding the pointer over the Viewport and pressing \texttt{Ctrl+A} then clicking \textbf{Location}
+        \item Repeat the process to apply all Rotations
+        \item Export to FBX file with default settings under the \textbf{Transform} section:
+        \begin{itemize}
+            \item \textbf{Up} set to \textbf{Y Up}
+            \item \textbf{Use Space Transform} checked
+            \item \textbf{Apply Transform} unchecked
+        \end{itemize}
+    \end{itemize}
+    \item After finishing the exports, import each FBX file into UE4
+    \item Create a Blueprint with the aircraft's body as the Root Component
+    \item Add the other meshes to the Blueprint
+    \item Manually set each component's Location to where they should be relative to the aircraft body
+\end{itemize}

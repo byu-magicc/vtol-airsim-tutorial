@@ -1,0 +1,237 @@
+%% Latex template for PhD dissertation or MS thesis
+%% Department of Electrical and Computer Engineering
+%% Brigham Young University
+%% Last Modified: 2021-9-2 by warnick@byu.edu
+
+\documentclass[12pt,oneside]{report}
+% generate the one-sided version: this is the ETD version
+% print the one-sided version one sided for all the department and college approvals
+
+% \documentclass[12pt,twoside]{report}
+% Uncomment this line (and comment line 6) to create the two-sided version.
+% Print the two-sided version two-sided for the optional printed and bound version.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Setup BYU thesis format
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{byustyle}
+% Setup the byu style sheet
+\byustylesetup{%
+    %
+    isdissertation = false,            % false for MS thesis, true for PhD dissertation
+    %
+    % Definitions of names needed in thesis/dissertation
+    deptname          = Department of Electrical and Computer Engineering,
+    committeechairman = Randal W. Beard,
+    committeemembera  = Tim W. McLain,
+    committeememberb  = Cameron K. Peterson,
+    %
+    %Change true/false to shorten for proofreading purposes
+    noabstract =         false,   % Do not show the abstract page
+    nouniversitypages =  true,   % Do not show any of the "university pages"
+    noacknowledgements = true,   % Do not show the Acknowledgements page
+    notableofcontents =  false,   % Do not show the Table of Contents
+    nolistoffigures =    false,   % Do not show the List of Figures
+    nolistoftables =      true,   % Do not show the List of Tables
+    nonomenclature =      true,   % Do not show the Nomenclature section - note that this section is optional
+    notocandlists =      false,   % Do not show the Table of Contents, List of Figures, or the List of Tables
+    noheaderatall =      false,   % Do not show any of the BYU Thesis header pages
+    keywords = {UAV, eVTOL, simulator, game engine} % your keywords
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Package inclusions go here
+% The list starts with some commonly used packages
+% That do not conflict with byustyle.sty
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}					% allows for mathematical symbols
+\usepackage{amssymb}					% defines symbol names for all the math symbols
+\usepackage{graphicx}        			%   for .pdf graphics inclusion
+\usepackage[calcwidth = \columnwidth]{caption}
+\usepackage{booktabs,threeparttable}
+\usepackage{setspace}					%	change the spacing inside a document
+\usepackage{epstopdf}					%	converts a .eps to a .pdf
+\usepackage{cite}						%	allows for citations
+\usepackage{float}						%	improves the interface for defining floating objects
+\usepackage{rotating}
+\usepackage{printlen}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Include additional \usepackage{} statements here.
+%    Add one package at a time.
+%    Warning:  Some packages are not compatible with byustyle.sty
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[T1]{fontenc}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[]{minted}
+\usepackage[most]{tcolorbox}
+\usepackage{etoolbox}
+\usepackage{listings}
+\usepackage{gensymb}
+\usepackage{subcaption}
+\usepackage{relsize}
+\usepackage{xspace}
+
+\tcbuselibrary{minted}
+
+\setminted[]{fontfamily=lmtt}
+\renewcommand*\ttdefault{lmtt}
+
+\usemintedstyle{friendly}
+\usemintedstyle[bash]{default}
+\setminted{bgcolor={},baselinestretch=1.0,autogobble}
+
+% tcblisting is a tcolorbox containing a listing (from listings, minted, etc.)
+\DeclareTCBListing{minttcb}{ O{} m }{listing only,arc=6.0pt,before skip=11pt,boxsep=1mm,top=4pt,bottom=4pt,toptitle=0pt,minted language=#2, #1}
+\BeforeBeginEnvironment{minttcb}{\strut}
+
+% tcbox is fitted to content, has no lower part, and can't be broken: good for inline text
+\DeclareTotalTCBox{\ci}{ O{text} m }
+{verbatim,frame empty,arc=2.0pt,colupper=black,colback=cultured,left=0.15mm,right=0.15mm}{\frenchspacing\mintinline{#1}{#2}}
+
+%These next two lines are for the citing with the IEEE style
+\renewcommand\citepunct{], [}
+\renewcommand\citedash{]--[}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% For doing bookmarks in the PDF file
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% For more info, see:
+% http://www.geocities.com/kijoo2000/latex2pdf.pdf
+% http://www.tug.org/applications/hyperref/manual.html
+\usepackage[pdftex,backref,pagebackref,plainpages=false]{hyperref}
+\hypersetup{
+    %bookmarks    = true, % Make bookmarks (default=true). This option
+                          %cannot be used after package has been loaded,
+                          %thus use like this: \usepackage[bookmarks=false]{hyperref}.
+    %
+    breaklinks   = false, % Allow link text to break across lines (default=false).
+    linktocpage  = false, % make page number, not text, be link on TOC, LOF and LOT
+    colorlinks   = false, % Color the text of links (true) or put color frames over
+    %
+    linkbordercolor  = {1 1 1}, % The color of the box around normal links (white so they won't show up)
+    citebordercolor  = {1 1 1}, % The color of the box around citations (white so they won't show up)
+                          % the links (false).
+    pdfstartview = {FitV}, % Set the startup page view. Possible options are:
+                           % FitH: Fit whole width of page
+                           % FitV: Fit whole height of page
+                           % FitB: Fit whole Bounding Box page
+                           % FitBH: Fit whole width of Bounding Box of page
+                           % FitBV: Fit whole height of Bounding Box of page
+    bookmarksnumbered  = true, % Put section numbers in bookmarks (default=false)
+    bookmarksopen      = true, % Open up the bookmark trees (default=false).
+    bookmarksopenlevel = 0, % Level to which bookmarks are open (default=\maxdimen).
+    bookmarkstype      = toc, % Specify which toc file to mimic (default=toc).
+    pdfpagemode        = {UseOutlines}, %  Specify how document starts when opened ({None}).
+                                        % Possible options are:,
+                                        % None: Neither bookmarks nor thumbnails are visible.
+                                        % UseOutlines: Bookmarks are visible.
+                                        % UseThumbs: Thumbnails are visible.
+                                        % FullScreen: Full-screen mode
+    pdftitle    = {First Line of your Thesis/Dissertation Title},
+    pdfauthor   = {Seth M. Nielsen},
+    pdfcreator  = {Seth M. Nielsen},
+    pdfsubject  = {Seth Nielsen's Master's Thesis},
+    pdfkeywords = {Master's Thesis, BYU},
+    pdfborder		=	{0 0 0},}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Define macros here - You may use these, or delete them, as you see fit.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \def\proof{\noindent{\it Proof: }}
+% \def\QED{\mbox{\rule[0pt]{1.5ex}{1.5ex}}}
+% \def\endproof{\hspace*{\fill}~\QED\par\endtrivlist\unskip}
+% \newcommand{\norm}[1]{\left\|#1\right\|}
+\newcommand{\abs}[1]{\left|#1\right|}
+% \newcommand{\defeq}{\stackrel{\triangle}{=}}
+% \newcommand{\re}{\mathbb{R}} 		% real numbers
+% \newcommand{\OMIT}[1]{{}} 		% omit sections of text
+\newcommand{\pd}[2]{\ensuremath{\frac{\partial #1}{\partial #2}}} % partial derivative
+% \newcommand{\superscript}[1]{\ensuremath{^\textrm{#1}}}
+% \newcommand{\subscript}[1]{\ensuremath{_\textrm{#1}}}
+
+\protected\def\CCh{{C\hspace{-.05em}\raisebox{.4ex}{\relsize{-3}\bf ++}}\xspace}
+
+\def\CC{{C\nolinebreak[4]\hspace{-.05em}\raisebox{.4ex}{\tiny\bf ++}~}}
+\def\CCd{{C\nolinebreak[4]\hspace{-.05em}\raisebox{.4ex}{\tiny\bf ++}}}
+
+\definecolor{alabaster}{rgb}{0.93,0.92,0.88}
+\definecolor{almond}{rgb}{0.94,0.87,0.8}
+\definecolor{babypowder}{rgb}{1.0,1.0,0.98}
+\definecolor{bone}{rgb}{0.89,0.85,0.79}
+\definecolor{champagne}{rgb}{0.97,0.91,0.81}
+\definecolor{cultured}{rgb}{0.96,0.96,0.96}
+\definecolor{eggshell}{rgb}{0.94,0.92,0.84}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Define the 'inverted pyramid' table caption
+% requirement from the College.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\DeclareCaptionJustification{InvertedPyramid}{\hsize=\linewidth
+                \parindent=0pt
+                \leftskip=0pt plus.5fil
+                \rightskip=0pt plus-0.5fil
+                \parfillskip=0pt plus1fil
+                \emergencystretch=1in
+                \parshape10
+                0.00in \linewidth
+                0.025\linewidth 0.95\linewidth
+                0.05\linewidth 0.9\linewidth
+                0.075\linewidth 0.85\linewidth
+                0.1\linewidth 0.8\linewidth
+                0.125\linewidth 0.75\linewidth
+         0.15\linewidth 0.70\linewidth
+         0.175\linewidth 0.65\linewidth
+         0.2\linewidth 0.60\linewidth
+         0.225\linewidth 0.55\linewidth
+                \strut
+    }
+\renewcommand{\TPTminimum}{3in}
+% \captionsetup[table]{justification=InvertedPyramid}
+
+\newsavebox{\tempbox}
+\newlength{\tempwidth}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Start Document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+% Define Title
+% For a title of more than one line, use the \\ to break up the lines so they appear in an inverse pyramid shape.
+% Also, make sure you use title case
+\title{A Visually Realistic Simulator for Autonomous eVTOL Aircraft}
+
+% Define author
+\author{Seth M. Nielsen}
+
+% For displaying the BYU Thesis header
+% 	This command assumes that there are documents called abstract.tex and
+% 	acknowledgements.tex (and optionally nomenclature.tex) that will be
+%   included in the header
+\showBYUHeader
+
+% Include chapters of the thesis here:
+% The includes are populated by example chapters
+\include{chapters/1-introduction}
+\include{chapters/2-user_guide}
+\include{chapters/3-extending}
+\include{chapters/4-custom_aircraft}
+\include{chapters/5-custom_envs}
+\include{chapters/6-conclusion}
+
+%%%%%%%%%%%%% begin Bibliography %%%%%%%%%%%%%%%%%
+\cleardoublepage{}
+\bibliographystyle{IEEEtran}
+\bibliography{refs} % Use your own BibTex file here
+
+% Include appendix sections here: (or comment these lines out to have no appendices)
+\appendix
+\include{appendices/appendixa}
+\include{appendices/appendixb}
+
+\end{document}

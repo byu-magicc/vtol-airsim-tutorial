@@ -1,0 +1,68 @@
+%TC:envir minttcb [ignore] xall
+
+\chapter{Further Information}\label{apdx:further_info}
+
+\section{List of Available Prebuilt Environments for Linux}\label{apdx:list_of_envs}
+
+This list is based on the available environments as of AirSim v1.5.0.
+
+\begin{itemize}
+    \item AbandonedPark --- contains a few scattered objects such as a ferris wheel and some swings
+    \item Africa --- open ground covered in patches of water, bordered by trees
+    \item AirSimNH --- a suburb with diverse features such as houses, cars, trees, and mobile animals
+    \item Blocks --- very simple example world with large geometric shapes scattered around
+    \item Building99 --- inside of a mall with a number of people walking about
+    \item LandscapeMountains --- large, open, and detailed mountain environment
+    \item MSBuild2018 --- tennis courts, trees, and buildings making up the Microsoft campus
+    \item TrapCamera --- an open and configurable world with some animated, stationary animals
+    \item ZhangJiajie --- an area above the clouds with large, stone pillars of varying heights scattered about
+\end{itemize}
+
+
+\section{Blender for Work Involving Meshes}\label{apdx:blender}
+
+Blender is an extremely powerful 3D modeling application that is open-source, completely free, and has full Linux support~\cite{Blender2021}. For these reasons, we highly recommend using Blender for any work that involves editing, producing, or preparing meshes for Unreal Engine. The examples in this text using Blender were done with Blender v2.93.5. Our experience has been good with regards to modifying a mesh and exporting it from Blender in FBX format for import into UE4. While not perfect, it is the only solution we know of that works reliably. This is the pipeline we used for the tiltrotor mesh that comes with VTOL-AirSim. We also used Blender to make a number of modifications to the mesh.
+
+On Ubuntu 20.04, there are three ways to install Blender:
+
+\begin{enumerate}
+    \item via their website at \url{https://blender.org/download} (Recommended)
+    \item via \ci{apt} with the command \ci{sudo apt install blender}
+    \item as a Snap application with the command \ci{sudo snap install --classic blender}
+\end{enumerate}
+
+We recommend the first option because it will get you the latest version of Blender (as will the third option, if you use Snap applications). The examples in this text were tested using the latest version of Blender, v2.93.5 --- however, at the time of this writing, the latest version of Blender available via \ci{apt} is v2.82. If you do use Blender v2.82, we cannot guarantee that the examples will work according to the instructions we provided.
+
+If you install via the official \url{blender.org} website, extract the archive file to somewhere on your machine and launch blender by running the \ci{blender} executable found inside the extracted directory.
+
+\section{Unreal Engine Paths And References}\label{apdx:unreal_paths}
+The way that Unreal Engine references paths in a project is rather unconventional. It is important to understand how it works if you are going to do work in the Unreal Editor. The following list explains the different path names that UE4 uses and what you can substitute them with to get the corresponding path on your file system. In the examples given, we will assume a project named \ci{Blocks}; the absolute path to the project is omitted for brevity.
+
+\begin{itemize}
+    \item Prefix \ci{/Game/}: substitute with \ci{<project>/Content}
+    \begin{itemize}
+        \item Example path: \ci{/Game/Flying/Meshes}
+        \item refers to: \ci{Blocks/Content/Flying/Meshes}
+    \end{itemize}
+    \item Prefix \ci{/AirSim/}: substitute with \ci{<project>/Plugins/<plugin_dir>/Content}
+    \begin{itemize}
+        \item Note: inside UE4, the name of the VTOL-AirSim Plugin is \textbf{\texttt{AirSim}}. UE4 does not read the directory name; it reads what is inside the \ci{AirSim.uplugin} file, which we have kept as \texttt{AirSim} for compatibility with the base AirSim repository. Thus, \ci{<plugin_dir>} could be \ci{Plugins/AirSim} or \ci{Plugins/vtol-AirSim}.
+        \item Example path: \ci{/AirSim/VTOL/Tiltrotor/Meshes}
+        \item refers to: \ci{Blocks/Plugins/vtol-AirSim/Content/VTOL/Tiltrotor/Meshes}
+        \item Example path: \ci{/AirSim/Blueprints}
+        \item refers to: \ci{Blocks/Plugins/AirSim/Content/Blueprints} (if using the default AirSim plugin rather than VTOL-AirSim)
+    \end{itemize}
+\end{itemize}
+
+In the \textbf{Content Browser}:
+
+\begin{itemize}
+    \item \ci{Content}: substitute with \ci{<project>/Content}
+    \begin{itemize}
+        \item Same as \ci{/Game/} above
+    \end{itemize}
+    \item \ci{AirSim Content}: substitute with \ci{<project>/Plugins/<plugin_dir>/Content}
+    \begin{itemize}
+        \item Same as \ci{/AirSim/} above
+    \end{itemize}
+\end{itemize}
